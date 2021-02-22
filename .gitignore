@@ -1,6 +1,6 @@
 ssl/*
 node_modules/*
 database/*
-db/*
+db/
 bt/*
 
