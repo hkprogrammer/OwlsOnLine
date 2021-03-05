@@ -3,4 +3,5 @@ node_modules/*
 database/*
 db/
 bt/*
-
+*.master.sqlite3
+db.js
