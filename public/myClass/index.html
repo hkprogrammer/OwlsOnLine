@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon">
+
+    <title>myClass</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+    
+    <!-- uniform css for all pages -->
+    <link href="../uniform.css" rel="stylesheet">
+    
+  </head>
+
+  <body onload="load(); loadClass(); pathLoad()">
+    <div class="container">
+    <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-dark mb-4">
+      <a class="navbar-brand" href="../">Owls Online</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li>
+            <a class="nav-link" href="../seminar">Seminars <span class="sr-only"></span></a>
+          </li>
+          <li>
+            <a class="nav-link" href="/myClass">MyClass <span class="sr-only"></span></a>
+          </li>
+        </ul>
+        <form class="form-inline mt-2 mt-md-0">
+          <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" style="width: 300px;">
+          <button class="btn btn-outline-success ml-1 my-2 my-sm-0 bg-success" type="submit"><img src="../icons/search.png" width="20px"></button>
+
+
+
+           <!-- displays "login" when logout -->
+          <div class="ml-2 mt-0" id="logged-out">
+            <a class="btn btn-outline-primary my-2 my-sm-0 bg-primary" href="/login"><span style="color:black;">Login</span></a>
+          </div>
+
+          <!-- User icon when logged in -->
+          <div class="ml-2 mt-0  dropdown show" id="logged-in" style="display: none;">
+            <a class="btn btn-outline-primary bg-primary dropdown-toggle" href="../profile/" id="dropdownUserIcon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <img src="../assets/img/user-icon.png" width="20px" style="margin: 0px;padding: 0px;">
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownUserIcon">
+              <a class="dropdown-item" ><strong id='displayUsername'></strong></a>
+              <a class="dropdown-item" href="../profile/">Profile</a>
+              <a class="dropdown-item" href="../settings/">Settings</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" onclick="logout()">Logout</a>
+            </div>
+
+
+          </div>
+
+        </form>
+
+  
+
+       
+      </div>
+    </nav>
+
+    <main role="main" class="container">
+        
+       <div class="jumbotron">
+            <h4>My Classes</h4>
+            <br>
+            <div>
+                <table class="table" id="classTable">
+                    <tr class="bg-light">
+                        <td>Class Name</td>
+                        <td>Teacher</td>
+                        <td>Details</td>
+                    </tr>
+                    <!-- <tr>
+                        <td>The Psyche in Literature</td>
+                        <td>Roland Nipps</td>
+                        <td><a href="/classDetail" class="btn btn-sm btn-primary" target="_blank">View</a></td>
+                    </tr> -->
+                </table>
+                <hr>
+                <button class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#joinClass" style="display: none;" id="joinClassBtn">Join a Class</button>
+
+                <div class="modal fade" id="joinClass" tabindex="-1" role="dialog" aria-labelledby="joinClass" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Join a Class</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+
+                        <span style="color:red;display:none" id="invalidDialog" >Code invalid</span>
+                        <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                        
+                            <span class="input-group-text" id="classLabel">Class Code</span>
+                          </div>
+                          <input type="text" class="form-control" aria-label="Small" aria-describedby="classLabel" id="classJoinCode">
+                        </div>
+                        
+
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="joinClass()">Join</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+            </div>
+        
+       </div>
+       <div class="jumbotron" id="createClassBox" style="display: none;">
+        <h4>Create Class</h4>
+        <span id="failureDialog" style="color:red; display:none">There was an error creating class, refresh and try again</span>
+        <div>
+            <label>Class Name: </label>
+            <input type="text" name="className" placeholder="Class Name" id="classNameField" required><span style="color:red">*</span>
+            <label>Teacher Name:</label>
+            <input type="text" name="teacherName" placeholder="Teacher Name" id="teacherNameField" required><span style="color:red">*</span>
+            <hr>
+            <label>Class Department</label>
+            <select id="selectCategoryField">
+                <option value="none" selected disabled hidden>Departments</option>
+                <option value="english">English</option>
+              </select><span style="color:red">*</span>
+            <label>Zoom Link:</label>
+            <input type="text" name="zoomLink" placeholder="Zoom Link" id="zoomLinkField">
+            <hr>
+            <button onclick="createClass()" class="btn btn-sm btn-success">Create Class</button>
+            
+        </div>
+        <br>
+        <div id="successDialog" style="display: none;">
+            <span>
+                Successfully created Class: <br>
+                    <ul>
+                        <li>Class Name: <span id="className"></span></li>
+                        <li>Class Teacher: <span id="classTeacher"></span></li>
+                        <li>Class Department: <span id="classDepartment"></span></li>
+                        <li>Class ID: <span id="classID"></span></li>
+                    </ul>
+                 
+            </span>
+        </div>
+       </div>
+    </main>
+  </div>
+   
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
+    <script src="../main.js"></script>
+    
+    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="../ckeditor/ckeditor/ckeditor.js"></script>
+    <script src="myClass.js"></script>
+  </body>
+</html>

@@ -55,7 +55,7 @@ function registerSubmit(){
         };
         xhttp.open("POST", "/credentials/register", true);
         xhttp.setRequestHeader("Content-type", "application/json");
-        //xhttp.send("fname=Henry&lname=Ford");
+        
         var sendcontent = {
     
             "username": username,

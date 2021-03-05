@@ -15,15 +15,29 @@ const sqlite3 = require('sqlite3')
 const routerRouting = require(__dirname + '/router/index.js');
 const systemRouting = require(__dirname + '/router/system.js')
 const credentialsRouting = require(__dirname + '/router/credentials.js')
-
+const myClassRouting = require(__dirname + '/router/myClass.js')
 
 
 // Constants
 const PORT = 3000;
 const HOST = 'localhost';
-var privateKey = fs.readFileSync(__dirname + '/ssl/server.key','utf8');
-var certificate = fs.readFileSync(__dirname + '/ssl/server.cert','utf8');
+var privateKey = fs.readFileSync(__dirname + '/ssl/rootCA.key','utf8');
+var certificate = fs.readFileSync(__dirname + '/ssl/rootCA.crt','utf8');
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
+
+//Environment
+process.env.NODE_ENV = 'development';
+switch(process.env.NODE_ENV){
+  case "development":
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      break
+  case "production":
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
+      break
+  default:
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
+      break
+}
 
 
 //SSL
@@ -55,7 +69,7 @@ app.use(express.static('public'));
 app.use('/index',routerRouting);
 app.use('/system',systemRouting);
 app.use('/credentials',credentialsRouting);
-
+app.use('/myClass', myClassRouting)
 
 
 

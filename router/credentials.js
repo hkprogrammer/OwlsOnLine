@@ -8,7 +8,7 @@ var router = express.Router();
 
 // modules import
 var database = require('../db/db.js');
-const db = require('../db/db.js');
+
 var session = require(__dirname + '/modules/session.js')
 var logging = require(__dirname + "/modules/log.js");
 
@@ -30,7 +30,12 @@ router.post('/login', (req, res) =>{
     var hashedPassword = md5(salt + incomingPassword)
     
     database.all("SELECT * FROM users", (err, rows)=>{
-        if(err) throw err
+        if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+        
+                    
         let found = false;
         for(let i=0;i<rows.length;i++){
             if(rows[i]["username"] == incomingUsername){
@@ -38,7 +43,11 @@ router.post('/login', (req, res) =>{
                 var passwordID = rows[i]["passwordID"]
                 var userID = rows[i]["userID"]
                 database.all(`SELECT * FROM credentials WHERE ID=${passwordID}`, (err, rows)=>{
-                    if(err) throw err  
+                    if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+                      
                     //console.log(rows[0]["hashedPass"], hashedPassword)
                     if(String(rows[0]["hashedPass"]) == String(hashedPassword)){
                         var sessionValue = new session().createSession();
@@ -57,7 +66,11 @@ router.post('/login', (req, res) =>{
                                     END AS Result
                                     FROM session`
                         database.all(sql, (err, rows)=>{
-                            if(err) throw err
+                            if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+                            
                             // let sessionFound = false;
                             // for(let i=0;i<rows.length;i++){
                             //     if(rows[i]["Result"] == "True"){
@@ -72,7 +85,11 @@ router.post('/login', (req, res) =>{
                             // }
                             
                             database.all(`SELECT sessionID FROM session ORDER BY sessionID ASC`, (err, rows)=>{
-                                if(err) throw err
+                                if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+                                
                                 
                                 //find current highest value of SesionID and increment by one to create new session ID.
                                 let max = 0;
@@ -149,7 +166,11 @@ router.post('/validateSession', (req,res)=>{
     var incomingSessionValue = String(data["sessionValue"])
     //console.log(data)
     database.all(`SELECT * FROM session`, (err, rows)=>{
-        if(err) throw err
+        if(err){
+            new logging(`Err ${err}`, "Errors").writeLog()
+            throw err
+        }
+        
         let foundSessionValue = false;
         for(let i=0;i<rows.length;i++){
             //console.log(rows)
@@ -220,10 +241,11 @@ router.post("/register",(req,res)=>{
         var highestIDNum = 1
         for(let i=0;i<rows.length;i++){
             if(Number(rows[i]["userID"]) > highestIDNum){
-                highestIDNum = Number(rows["userID"])
+                highestIDNum = Number(rows[i]["userID"])
             }
         }
         var userID = Number(highestIDNum) + 1
+        
         if(!found){
             
             
@@ -248,9 +270,14 @@ router.post("/register",(req,res)=>{
                     let passID = highestIDNum + 1;
                     //default title is null, priviledge is 1
                     sql = `INSERT INTO users(username,passwordID,userID,fullName,role,priviledge) 
-                    VALUES ("${incomingUsername}", ${passID}, ${userID}, "${incomingFullname}","${incomingRole}",1)`
+                    VALUES("${incomingUsername}",${passID},${userID},"${incomingFullname}","${incomingRole}",1)`
+                   
                     database.run(sql, (err)=>{
-                        if(err) throw err
+                        if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+                        
                     })
 
                     database.run(`INSERT INTO credentials(ID,hashedPass) VALUES (${passID},"${hashedPassword}")`)
@@ -272,6 +299,57 @@ router.post("/register",(req,res)=>{
     
 
 })
+
+router.post("/queryInformations", (req,res)=>{
+
+    var data = req.body;
+    var incomingUserID = data["userID"]
+    var incomingSessionValue = data["sessionValue"]
+    
+    let sql = `SELECT * FROM session`
+    database.all(sql, (err,rows)=>{
+        let foundFlag = false;
+        for(let i = 0; i <rows.length;i++){
+            if(rows[i]["sessionValue"] == incomingSessionValue
+                && rows[i]["userID"] == incomingUserID){
+                
+                foundFlag = true;
+
+            }
+        }
+        if(foundFlag){
+            
+            sql = `SELECT * FROM users WHERE userID=${incomingUserID}`;
+            database.all(sql, (err,rows)=>{
+                let msg = {
+                    "status": "success",
+                    "username" : rows[0]["username"],
+                    "userID" : rows[0]["userID"],
+                    "fullName" : rows[0]["fullName"],
+                    "title" : rows[0]["title"],
+                    "role" : rows[0]["title"],
+                    "priviledge" : rows[0]["priviledge"]
+                }
+                res.send(msg)
+                //let l = new logging(`User ${incomingUserID} with ${incomingSessionValue} is attempting to query information, this action was successful.` + JSON.stringify(msg), "credentials").writeLog();
+
+            })
+
+        }
+        else{
+            let msg = {
+                "status": "invalid",
+                "message" : "User not found, re-login again. This incident of invalid entry is logged."
+            }
+            res.send(msg)
+            let l = new logging(`User ${incomingUserID} with ${incomingSessionValue} is attempting to query information but was rejected with an invalid entry, this incident is logged.`, "credentials").writeLog();
+            console.log(`User ${incomingUserID} with ${incomingSessionValue} is attempting to query information but was rejected with an invalid entry, this incident is logged.`)
+        }
+    })
+
+})
+
+
 
 
 function isEmpty(input){

@@ -2,6 +2,8 @@
 const fs = require("fs");
 
 const credentials = __dirname + "/../../log/credentials.log"
+const myClass = __dirname + "/../../log/myClass.log"
+const errors = __dirname + "/../../log/err.log"
 
 class log{
     constructor(text, document){
@@ -14,7 +16,11 @@ class log{
             case "credentials":
                
                 fs.readFile(credentials, (err,data)=>{
-                    if(err) throw err
+                    if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+                    
                     var date = new Date().toDateString()
                     let finalData = String(data) 
                     
@@ -22,15 +28,84 @@ class log{
                     
                     + String(date) + "\n" + `Type of Log: ${this.document} \n` + "Log Data: \n" +  String(this.text);
                     fs.writeFile(credentials,finalData,(err)=>{
-                        if(err) throw err
+                        if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+
                         
                     })
                 })
                 break
                 
-            case "" :
+            case "myClass" :
+                fs.readFile(myClass, (err,data)=>{
+                    if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+
+                    var date = new Date().toDateString()
+                    let finalData = String(data) 
+                    
+                        + "\n" + "\n====================================================\n"
+                    
+                    + String(date) + "\n" + `Type of Log: ${this.document} \n` + "Log Data: \n" +  String(this.text);
+                    fs.writeFile(myClass,finalData,(err)=>{
+                        if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+
+                        
+                    })
+                })
+                break
+            case "Errors":
+                fs.readFile(errors, (err,data)=>{
+                    if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+
+                    var date = new Date().toDateString()
+                    let finalData = String(data) 
+                    
+                        + "\n" + "\n====================================================\n"
+                    
+                    + String(date) + "\n" + `Type of Log: ${this.document} \n` + "Log Data: \n" +  String(this.text);
+                    fs.writeFile(errors,finalData,(err)=>{
+                        if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+
+                        
+                    })
+                })
                 break
             default:
+                fs.readFile(errors, (err,data)=>{
+                    if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+
+                    var date = new Date().toDateString()
+                    let finalData = String(data) 
+                    
+                        + "\n" + "\n====================================================\n"
+                    
+                    + String(date) + "\n" + `Type of Log: ${this.document} \n` + "Log Data: \n" +  String(this.text);
+                    fs.writeFile(errors,finalData,(err)=>{
+                        if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+
+                        
+                    })
+                })
                 break
         }   
     }

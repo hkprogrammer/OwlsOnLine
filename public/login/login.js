@@ -33,7 +33,7 @@ function loginSubmit(){
     };
     xhttp.open("POST", "/credentials/login", true);
     xhttp.setRequestHeader("Content-type", "application/json");
-    //xhttp.send("fname=Henry&lname=Ford");
+    
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value
     let sendcontent = {
@@ -72,7 +72,7 @@ function load(){
     };
     xhttp.open("POST", "/credentials/validateSession", true);
     xhttp.setRequestHeader("Content-type", "application/json");
-    //xhttp.send("fname=Henry&lname=Ford");
+    
     let sendcontent = {
         "userID" : userID,
         "sessionValue" : sessionValue

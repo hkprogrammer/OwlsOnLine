@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon">
+
+    <title>myClass details</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../bootstrap/css/bootstrap.css" rel="stylesheet">
+    
+    <!-- uniform css for all pages -->
+    <link href="../../uniform.css" rel="stylesheet">
+    <script src="../../main.js"></script>
+    <script src="details.js"></script>
+  </head>
+
+  <body onload="load();detailsLoad();loadAssignment();checkCreateAssignment()">
+    
+    <div class="container">
+    <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-dark mb-4">
+      <a class="navbar-brand" href="../">Owls Online</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li>
+            <a class="nav-link" href="/seminar">Seminars <span class="sr-only"></span></a>
+          </li>
+          <li>
+            <a class="nav-link" href="/myClass">MyClass <span class="sr-only"></span></a>
+          </li>
+        </ul>
+        <form class="form-inline mt-2 mt-md-0">
+          <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" style="width: 300px;">
+          <button class="btn btn-outline-success ml-1 my-2 my-sm-0 bg-success" type="submit"><img src="/icons/search.png" width="20px"></button>
+
+
+
+           <!-- displays "login" when logout -->
+          <div class="ml-2 mt-0" id="logged-out">
+            <a class="btn btn-outline-primary my-2 my-sm-0 bg-primary" href="/login"><span style="color:black;">Login</span></a>
+          </div>
+
+          <!-- User icon when logged in -->
+          <div class="ml-2 mt-0  dropdown show" id="logged-in" style="display: none;">
+            <a class="btn btn-outline-primary bg-primary dropdown-toggle" href="/profile/" id="dropdownUserIcon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <img src="/assets/img/user-icon.png" width="20px" style="margin: 0px;padding: 0px;">
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownUserIcon">
+              <a class="dropdown-item" ><strong id='displayUsername'></strong></a>
+              <a class="dropdown-item" href="/profile/">Profile</a>
+              <a class="dropdown-item" href="/settings/">Settings</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" onclick="logout()">Logout</a>
+            </div>
+
+
+          </div>
+
+        </form>
+
+  
+
+       
+      </div>
+    </nav>
+
+    <main role="main" class="container">
+        
+       <div class="jumbotron">
+            <div class="row">
+                <div class="col-md-8 col-sm-12">
+                    <h4 id="className">ClassName</h4>
+                    <sub id="classTeacherName">classTeacherName</sub>
+                    <br>
+                    <sub id="classID"></sub>
+                    
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <br>
+                    <a href="" id="zoomLink" target="_blank">Class Zoom Link</a>
+                </div>
+                
+            </div>
+            <br>
+            <hr>
+            <div id="assignments">
+                <h4>Upcoming Assignments</h4>
+                <table class="table" id="assignmentTable">
+                    <thead class="bg-light">
+                        <td width="40%">Name</td>
+                        <td width="20%">Type</td>
+                        <td width="20%">Date</td>
+                        <td width="10%">Action</td>
+                        <td width="10%">Delete Assignment</td>
+                    </thead>
+                   
+                </table>
+            </div>
+            
+       </div>
+       <div class="jumbotron" id="createAssignment" style="display: none;">
+        <h4>Create an Assignment</h4>
+        <span id="failureDialog" style="color:red; display:none">There was an error creating assignment, please check your inputs</span>
+        <div>
+            <label>Assignment Name: </label>
+            <input type="text" name="assignmentName" placeholder="Assignment Name" id="assignmentNameField" required><span style="color:red">*</span>
+            <label>Due Date:</label>
+            <input type="text" name="dueDate" placeholder="Date MM-DD-YY" id="dueDateField" required><span style="color:red">*</span>
+            <hr>
+            <label>Assignment Type</label>
+            <select id="selectTypeField">
+                <option value="none" selected disabled hidden>Types</option>
+                <option value="seminar">Seminar</option>
+                <option value="QAR" disabled>Question and Response</option>
+                <!-- QAR = Question and Response -->
+            </select><span style="color:red">*</span>
+            
+            <hr>
+            <button onclick="createAssignment()" class="btn btn-sm btn-success">Create Assignment</button>
+            
+        </div>
+        <br>
+        <div id="successDialog" style="display: none;">
+            <span>
+                Successfully created Assignment: <br>
+                    <ul>
+                        <li>Assignment Name: <span id="assignmentName"></span></li>
+                        <li>Assignment Type: <span id="assignmentType"></span></li>
+                        <li>Assignment Due date: <span id="assignmentDueDate"></span></li>
+                        <li>Assignment ID: <span id="assignmentID"></span></li>
+                    </ul>
+                 
+            </span>
+        </div>
+       </div>
+       
+    </main>
+  </div>
+   
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="../../bootstrap/js/bootstrap.min.js"></script>
+    
+    
+    <link href="../../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="../../ckeditor/ckeditor/ckeditor.js"></script>
+    
+  </body>
+</html>

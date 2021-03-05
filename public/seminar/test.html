@@ -1,0 +1,34 @@
+ <!DOCTYPE html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="seminar.js"></script>
+    <link href="seminar.css" rel="stylesheet"/>
+</head>
+ <body>
+
+  
+
+    <div id="editorjs"></div>
+
+    <button id="save-button">Save</button>
+    <pre id="output"></pre>
+
+    <script>
+        const editor = new EditorJS({
+        autofocus: true,
+        tools: {
+            image: SimpleImage
+        }
+        });
+
+        const saveButton = document.getElementById('save-button');
+        const output = document.getElementById('output');
+
+        saveButton.addEventListener('click', () => {
+        editor.save().then( savedData => {
+            output.innerHTML = JSON.stringify(savedData, null, 4);
+        })
+        })
+    </script>
+ </body>
+ 
