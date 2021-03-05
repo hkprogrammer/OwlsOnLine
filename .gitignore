@@ -1,7 +1,8 @@
 ssl/*
 node_modules/*
 database/*
-db/
+db/*
 bt/*
 *.sqlite3
+master.sqlite3
 db.js
