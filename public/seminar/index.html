@@ -17,7 +17,7 @@
     
   </head>
 
-  <body onload="load()">
+  <body onload="load();checkSeminarID()">
     <div class="container">
     <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-dark mb-4">
       <a class="navbar-brand" href="../">Owls Online</a>
@@ -72,28 +72,45 @@
     </nav>
 
     <main role="main" class="container">
-        
-        <alert style="color:red;" class="text-center" id="invalidMessage">
-          
-        </alert>
-        <div style="width: 100%;">
-            <textarea name="textEditor" style="width: 200px;">
 
-            </textarea>
+        <div class="jumbotron" id="joinSeminar" style="display:none;">
+          <h4>Attend a seminar</h4>
+          <table class="table" id="assignmentTable">
+            <thead class="bg-light">
+                <td width="50%">Assignment Name</td>
+                <td>Class Name</td>
+                <td>Teacher Name</td>
+                <td>Action</td>
+            </thead>
+           
+        </table>
         </div>
 
-        <br>
-        
-        <div class="rows">
-
-         
-         
-            <a onclick="saveData()" class="btn btn-primary btn-md text-white">Publish</a>
+        <div class="jumbotron" id="seminarArea">
+          <h4>Publish your response</h4>
+          <alert style="color:red;" class="text-center" id="invalidMessage">
           
+          </alert>
+          <div style="width: 100%;">
+              <textarea name="textEditor" style="width: 200px;">
+  
+              </textarea>
+          </div>
+  
+          <br>
           
-
-          
+          <div class="rows">
+  
+           
+           
+              <a onclick="saveData()" class="btn btn-primary btn-md text-white">Publish</a>
+            
+            
+  
+            
+          </div>
         </div>
+        
         
         <div id="output">
 

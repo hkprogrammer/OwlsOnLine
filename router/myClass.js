@@ -101,9 +101,9 @@ router.post("/loadClass", (req,res)=>{
     //same code from credentials.js 
     database.all(`SELECT * FROM session`, (err, rows)=>{
         if(err){
-                        new logging(`Err ${err}`, "Errors").writeLog()
-                        throw err
-                    }
+            new logging(`Err ${err}`, "Errors").writeLog()
+            throw err
+        }
         
         let foundSessionValue = false;
         for(let i=0;i<rows.length;i++){
@@ -154,7 +154,7 @@ router.post("/loadClass", (req,res)=>{
                                     //onsole.log(rows[i])
                                     
                                     let splitStudentID;
-                                    console.log(rows[i]["classStudentsID"])
+                                   
                                     if(rows[i]["classStudentsID"] != null && rows[i]["classStudentsID"] != ""){
                                         splitStudentID = rows[i]["classStudentsID"].split(",")
                                         for(let n =0;n<splitStudentID.length;n++){
@@ -264,7 +264,7 @@ router.post("/createAssignment", (req,res)=>{
         let teacherFullName = ""
         for(let i=0;i<rows.length;i++){
             if(rows[i]["userID"] == incomingTeacherID && Number(rows[i]["priviledge"]) > 1){
-                teacherFullName = rows[i]["userFullName"]
+                teacherFullName = rows[i]["fullName"]
                 foundFlag = true;
                 break
             }
@@ -517,6 +517,164 @@ router.post("/joinClass",(req,res)=>{
 
     })
 
+
+})
+
+
+/**
+ * 
+ * input arguments
+ * {
+ *      "userID" : localStorage.getItem("userID"),
+        "sessionValue" : localStorage.getItem("sessionValue")
+    }
+ * 
+ */
+router.post("/loadAllAssignment", (req,res)=>{
+
+    var data = req.body;
+    var incomingUserID = data["userID"]
+    var incomingSessionValue = data["sessionValue"]
+    
+    axios({
+        method: 'post',
+        url: 'https://127.0.0.1:3000/myClass/loadClass',
+        data: { 
+            "userID": incomingUserID,
+            "sessionValue" : incomingSessionValue
+        }
+        }).then((response) => {
+        //response.data -> {rows : [], status: String}
+            if(response.data["status"] == "success"){
+                var classIDList = []
+                let errorFlag = false;
+                var allClassList = response.data["rows"]
+                if(response.data["rows"] == null){
+                    errorFlag = true;
+                    
+                    new logging(`Error`, "Errors").writeLog()
+                    let responsePacket = {
+                        "status" : "failure"
+                    }
+                    res.send(responsePacket)
+                }
+                else{
+                    for(let i=0;i<response.data["rows"].length;i++){
+                        let row = response.data["rows"][i]
+                        classIDList.push(row["classID"])
+                    }
+
+                    axios({
+                    method: 'post',
+                    url: 'https://127.0.0.1:3000/myClass/loadClass',
+                    data: { 
+                        "userID": incomingUserID,
+                        "sessionValue" : incomingSessionValue
+                    }
+                    }).then((response) => {
+                    //response.data -> {rows : [], status: String}
+                        if(response.data["status"] == "success"){
+                            var classIDList = []
+                        
+                            if(response.data["rows"] == null){
+                                
+                                new logging(`Err error`, "Errors").writeLog()
+                                let responsePacket = {
+                                    "status" : "failure"
+                                }
+                                res.send(responsePacket)
+                            }
+                            
+                            else{
+                                for(let i=0;i<response.data["rows"].length;i++){
+                                    let row = response.data["rows"][i]
+                                    classIDList.push(row["classID"])
+                                    
+                                }
+                            }
+                            let sql = `SELECT * FROM assignment`
+                            database.all(sql, (err,rows)=>{
+                                if(err){
+                                    new logging(`Err ${err}`, "Errors").writeLog()
+                                    throw err
+                                }
+                                let assignmentList = []
+                                if(rows != null){
+                                    
+                                    for(let i = 0;i<rows.length;i++){
+                                        for(let n = 0;n<classIDList.length;n++){
+                                            
+                                            if(rows[i]["assignmentClassID"] == classIDList[n]){
+                                                assignmentList.push(rows[i])
+                                                
+                                            }
+                                        }
+                                        
+                                    }
+                                    
+                                    let responsePacket = {
+                                        "status": "success",
+                                        "rows" : assignmentList,
+                                        "classList": allClassList
+                                    }
+                                    
+                                    res.send(responsePacket)
+
+                                }
+                                else{
+                                    new logging(`Err Error`, "Errors").writeLog()
+                                    
+                                    let responsePacket = {
+                                        "status" : "failure"
+                                    }
+                                    res.send(responsePacket)
+                                }
+                                
+
+
+                            })
+                            
+
+                        
+                        }
+                        else{
+                            let responsePacket = {
+                                "status" : "failure"
+                            }
+                            res.send(responsePacket)
+                        }
+                    
+
+
+                    }, (error) => {
+                        new logging(`Err ${error}`, "Errors").writeLog()
+                        console.error(error)
+                    });
+
+                }
+                
+                
+
+            
+            }
+            else{
+                let responsePacket = {
+                    "status" : "failure"
+                }
+                res.send(responsePacket)
+            }
+        
+
+
+        }, (error) => {
+            new logging(`Err ${err}`, "Errors").writeLog()
+            console.error(error)
+        });
+
+                
+                
+
+            
 
 })
 

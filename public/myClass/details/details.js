@@ -87,17 +87,34 @@ function loadAssignment(){
         
         switch(data["status"]){
             case "success":
+                let tempLocal = []
                 for(let i =0;i<data["rows"].length;i++){
                     let d = data["rows"][i]
-                    document.getElementById("assignmentTable").innerHTML +=  `
-                    <tr>
-                        <td>${d["assignmentName"]}</td>
-                        <td>${d["assignmentType"]}</td>
-                        <td>${d["assignmentDueDate"]}</td>
-                        <td><a href="/seminar?assignmentID=${d["assignmentID"]}" class="btn btn-primary btn-sm">Open</a></td>
-                        <td><a onclick="deleteAssignment('${d["assignmentID"]}')" class="btn btn-sm btn-danger text-white">delete</a></td>
-                    </tr>`
+                    if(d["assignmentType"] == "seminar"){
+                        document.getElementById("assignmentTable").innerHTML +=  `
+                        <tr>
+                            <td>${d["assignmentName"]}</td>
+                            <td>${d["assignmentType"]}</td>
+                            <td>${d["assignmentDueDate"]}</td>
+                            <td><a href="/seminar?seminarID=${d["assignmentID"]}" class="btn btn-primary btn-sm">Open</a></td>
+                            <td><a onclick="deleteAssignment('${d["assignmentID"]}')" class="btn btn-sm btn-danger text-white">delete</a></td>
+                        </tr>`
+                    }
+                    else{
+                        document.getElementById("assignmentTable").innerHTML +=  `
+                        <tr>
+                            <td>${d["assignmentName"]}</td>
+                            <td>${d["assignmentType"]}</td>
+                            <td>${d["assignmentDueDate"]}</td>
+                            <td><a href="" class="btn btn-primary btn-sm">Open</a></td>
+                            <td><a onclick="deleteAssignment('${d["assignmentID"]}')" class="btn btn-sm btn-danger text-white">delete</a></td>
+                        </tr>`
+                    }
+                    tempLocal.push(JSON.stringify(d))
+                    
+                    
                 }
+                localStorage.setItem("assignmentDetail", tempLocal)
                 break
             case "invalid":
                 document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
@@ -180,7 +197,10 @@ function checkCreateAssignment(){
 function notEmpty(list){
     for(let i=0;i<list.length;i++){
         let d = String(list[i]) //d variable stores the temporary data in string type for each iterations in list.
-        if(d == "" || d == " " || d.length<1 || d == null || d == 0){
+        if(d == "" || d == " " || d == null || d == 0){
+			if(d.length<1){
+				return false
+			}
             return false
         }
         else{
