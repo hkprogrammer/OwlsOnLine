@@ -83,7 +83,7 @@ function loadAssignment(){
       
         var data = JSON.parse(this.responseText)
         
-        console.log({data})
+       
         
         switch(data["status"]){
             case "success":
@@ -96,7 +96,7 @@ function loadAssignment(){
                             <td>${d["assignmentName"]}</td>
                             <td>${d["assignmentType"]}</td>
                             <td>${d["assignmentDueDate"]}</td>
-                            <td><a href="/seminar?seminarID=${d["assignmentID"]}" class="btn btn-primary btn-sm">Open</a></td>
+                            <td><a class="btn btn-primary btn-sm" onclick="localStorage.setItem(\'targetClass\',\'${classID}\')" href="/seminar?seminarID=${d["assignmentID"]}">Open</a></td>
                             <td><a onclick="deleteAssignment('${d["assignmentID"]}')" class="btn btn-sm btn-danger text-white">delete</a></td>
                         </tr>`
                     }
@@ -110,11 +110,11 @@ function loadAssignment(){
                             <td><a onclick="deleteAssignment('${d["assignmentID"]}')" class="btn btn-sm btn-danger text-white">delete</a></td>
                         </tr>`
                     }
-                    tempLocal.push(JSON.stringify(d))
+                    tempLocal.push(d)
                     
                     
                 }
-                localStorage.setItem("assignmentDetail", tempLocal)
+                localStorage.setItem("assignmentDetail", JSON.stringify([tempLocal]))
                 break
             case "invalid":
                 document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
