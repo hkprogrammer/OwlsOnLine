@@ -9,7 +9,7 @@ const axios = require('axios');
 var router = express.Router();
 var database = require('../db/db.js');
 var logging = require(__dirname + "/modules/log.js");
-
+var port = require(__dirname + '/modules/port.js')
 
 
 //createClass function to create class by teachers
@@ -37,10 +37,10 @@ router.post('/createClass', function (req, res) {
     let sql = `SELECT classID FROM myClass`
     database.all(sql, (err, rows)=>{
         if(err){
-                        new logging(`Err ${err}`, "Errors").writeLog()
-                        throw err
-                    }
-        ;
+            new logging(`Err ${err}`, "Errors").writeLog()
+            throw err
+        }
+        
         let highestValue = 0;
         for(let i =0;i<rows.length;i++){
             if(Number(rows[i]["classID"]) > Number(highestValue)){
@@ -399,7 +399,7 @@ router.post("/deleteAssignment", (req,res)=>{
     
     axios({
         method: 'post',
-        url: 'https://127.0.0.1:3000/credentials/validateSession',
+        url: 'https://127.0.0.1:' + new port().portNumber() + '/credentials/validateSession',
         data: { 
             "userID": incomingUserID,
             "sessionValue" : incomingSessionValue
@@ -417,6 +417,9 @@ router.post("/deleteAssignment", (req,res)=>{
                                 new logging(`Err ${err}`, "Errors").writeLog()
                                 throw err
                             }
+                            database.run(`DELETE FROM seminarEntry WHERE assignmentID=${incomingAssignmentID}`)
+                            database.run(`DELETE FROM seminarTopic WHERE seminarID=${incomingAssignmentID}`)
+                            
                             res.send({"status" : "success"})
                         })
                     }
@@ -539,7 +542,7 @@ router.post("/loadAllAssignment", (req,res)=>{
    
     axios({
         method: 'post',
-        url: 'https://127.0.0.1:3000/myClass/loadClass',
+        url: 'https://127.0.0.1:' + new port().portNumber() +'/myClass/loadClass',
         data: { 
             "userID": incomingUserID,
             "sessionValue" : incomingSessionValue
@@ -651,45 +654,7 @@ router.post("/loadAllAssignment", (req,res)=>{
     }
  */
 
-router.post("/publishSeminarQuote", (req,res)=>{
-    
-    var data = req.body;
 
-    var incomingUserID = data["userID"]
-    var incomingSessionValue = data["sessionValue"]
-    var incomingTypedResponse = data["typedResponse"]
-    var incomingClassID = data["classID"]
-    var incomingAsignmentID = data["assignmentID"]
-
-    axios({
-        method: 'post',
-        url: 'https://127.0.0.1:3000/credentials/validateSession',
-        data: { 
-            "userID": incomingUserID,
-            "sessionValue" : incomingSessionValue
-        }
-        }).then((response) => {
-        //response.data -> {rows : [], status: String}
-            if(response.data["status"] == "success"){
-
-                
-            
-            }
-            else{
-                let responsePacket = {
-                    "status" : "failure"
-                }
-                res.send(responsePacket)
-            }
-        
-
-
-        }, (error) => {
-            new logging(`Err ${error}`, "Errors").writeLog()
-            console.error(error)
-    });
-
-})
 
 
 // if(err){

@@ -19,7 +19,7 @@
 
   </head>
 
-  <body onload="load(); loadClass()">
+  <body onload="load(); loadClass();loadAssignment()">
     <div class="container">
     <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-dark mb-4">
       <a class="navbar-brand" href="/">Owls Online</a>
@@ -97,7 +97,18 @@
         </div>
         <div class="col-md-4 col-sm-12">
           <div class="jumbotron">
-            <h4>Upcoming Assignments</h4>
+            <div id="assignments">
+              <h4>Upcoming Assignments</h4>
+              <table class="table table-sm" id="assignmentTable" style="font-size:small">
+                  <thead class="bg-light">
+                      <td width="">Name</td>
+                      <td width="">Type</td>
+                      <td width="">Date</td>
+                      <td width="">Action</td>
+                  </thead>
+                 
+              </table>
+          </div>
           </div>
         </div>
       </div> 
@@ -109,6 +120,7 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="main.js"></script>
+    <script src="index.js"></script>
     <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
   </body>
 </html>

@@ -70,6 +70,7 @@ function createAssignment(){
 
 }
 
+
 function loadAssignment(){
     var userID = localStorage.getItem("userID")
 
@@ -144,6 +145,7 @@ function loadAssignment(){
 
 
 }
+
 
 function deleteAssignment(assignmentID){
 

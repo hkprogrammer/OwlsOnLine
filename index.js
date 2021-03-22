@@ -16,7 +16,7 @@ const routerRouting = require(__dirname + '/router/index.js');
 const systemRouting = require(__dirname + '/router/system.js')
 const credentialsRouting = require(__dirname + '/router/credentials.js')
 const myClassRouting = require(__dirname + '/router/myClass.js')
-
+const seminarRouting = require(__dirname + '/router/seminars.js')
 
 // Constants
 const PORT = 3000;
@@ -70,6 +70,8 @@ app.use('/index',routerRouting);
 app.use('/system',systemRouting);
 app.use('/credentials',credentialsRouting);
 app.use('/myClass', myClassRouting)
+app.use('/seminars', seminarRouting)
+
 
 
 

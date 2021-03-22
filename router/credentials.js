@@ -183,10 +183,11 @@ router.post('/validateSession', (req,res)=>{
                     }
                     foundSessionValue = true
                     res.send(responsePacket)
+                    
                     break
                 }
                 else{
-                    
+                    console.log("Invalid Entry")
                 }
             }
             
@@ -196,6 +197,7 @@ router.post('/validateSession', (req,res)=>{
                 "status" : "failure",
                 "expireDate" : ""
             }
+            
             res.send(responsePacket)
             
         }
