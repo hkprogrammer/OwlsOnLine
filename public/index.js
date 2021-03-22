@@ -32,7 +32,7 @@ function loadAssignment(){
 						<td>${d["assignmentName"]}</td>
 						<td>${className}</td>
 						<td>${teacherName}</td>
-						<td><a class="btn btn-sm btn-primary" target="_blank" onclick="localStorage.setItem(\'targetClass\',\'${classID}\')" href="/seminar?seminarID=${d["assignmentID"]}" >Participate</a></td>
+						<td><a class="btn btn-sm btn-primary" target="_blank" onclick="saveClassDetails();localStorage.setItem(\'targetClass\',\'${classID}\')" href="/seminar?seminarID=${d["assignmentID"]}" >Participate</a></td>
 					</tr>`
 					tempLocal.push(d)
 				}

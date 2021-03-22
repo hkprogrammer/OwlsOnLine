@@ -5,18 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon">
+    <link rel="icon" href="/logo.png">
 
     <title>Seminars</title>
 
-    <!-- Bootstrap core CSS -->
+     <!-- uniform css for all pages -->
+     <link href="../uniform.css" rel="stylesheet">
+
+    <!-- bootStrap -->
     <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
-    
-    <!-- uniform css for all pages -->
-    <link href="../uniform.css" rel="stylesheet">
-    
-    <!-- Popper JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+  
   </head>
 
   <body onload="load();checkSeminarID();loadAllEntry()">
@@ -115,6 +113,17 @@
           <alert style="color:red;" class="text-center" id="invalidMessage">
           
           </alert>
+          <br>
+          <div id="quotingSection" style="display:none">
+            <sub>You are quoting:<a class="btn btn-sm btn-warning" onclick="document.getElementById('quotingArea').innerHTML = ''">Clear the quotes</a></sub>
+            <div class="card" style="background-color: white;min-height: 100px;">
+              
+              <div class="card-body" id="quotingArea" style="text-align:center"></div>
+             
+            </div>
+
+          </div>
+          <br>
           <div style="width: 100%;">
               <textarea name="textEditor" style="width: 200px;">
   
@@ -216,7 +225,7 @@
                 
                   <div class="" id="createSeminarTopic">
                     <h4>Create an topic</h4>
-                    <span id="failureDialog" style="color:red; display:none">There was an error creating assignment, please check your inputs</span>
+                    <span id="seminarTopicAlert" style="color:red; display:none">You cannot leave it blank</span>
                     <div>
                         <label>Topic Name: </label>
                         <input type="text" name="topicName" placeholder="Topic Name" id="topicNameField" required><span style="color:red">*</span>
@@ -226,6 +235,10 @@
                             <option value="default" selected default>default</option>
                             <option value="Blue">Blue</option>
                             <option value="Red">Red</option>
+                            <option value="Green">Green</option>
+                            <option value="Grey">Grey</option>
+                            <option value="Yellow">Yellow</option>
+                            
                         </select><span style="color:red">*</span>
                         
                         <hr>
@@ -243,12 +256,25 @@
           </div>
         </div>
         <div class="jumbotron" id="topicDetail" style="display:none">
-
+          <div class="row">
+            <div class="col-8">
+              <h4>Displaying Entries for Topic: <a class="btn text-black" id="topicTag"></a></h4>
+            </div>
+            <div class="col-4">
+              <div style="float:right">
+                <a onclick="showTopic()" class="btn btn-success text-white">Go back</a>
+              </div>
+            </div>
+            
+          </div>
+          <hr>
+         
 
         </div>
         <div class="jumbotron" id="viewAllEntry">
-          <h4>View All Entries</h4>
-          
+          <h4>All Entries:</h4>
+          <hr>
+     
         </div>
       </div>
 
@@ -258,14 +284,24 @@
   </div>
 
  
-  
+   
+    
+ 
+    <!-- Unique CSS -->
+    <link href="seminar.css" rel="stylesheet">
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="../bootstrap/js/bootstrap.min.js"></script>
     <script src="../main.js"></script>
-    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+
    
+     <!-- Popper JS -->
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+  
+
+
     <script src="../ckeditor/ckeditor/ckeditor.js"></script>
     <script src="seminar.js"></script>
+    
   </body>
 </html>

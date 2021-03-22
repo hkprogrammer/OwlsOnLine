@@ -22,7 +22,7 @@ function checkSeminarID(){
 function notEmpty(inList){
     for(let i=0;i<inList.length;i++){
         let d = String(inList[i]) //d variable stores the temporary data in string type for each iterations in list.
-        if(d == "" || d == " " || d == null || d == 0 || d == undefined || d == "NaN"){
+        if(d == "" || d == " " || d == "null" || d == "0" || d == "NaN" || d == "undefined"){
 			if(d.length<1){
 				return false
 			}
@@ -38,6 +38,7 @@ function notEmpty(inList){
 function showTopics(){
 	document.getElementById("topicSection").style.display = "block"
 	document.getElementById("createSeminarTopic").style.display = "block"
+	
 }
 
 function loadClassDetails(seminarID){
@@ -61,7 +62,7 @@ function loadClassDetails(seminarID){
 		
 		
 		for(let i=0;i<assignments.length;i++){
-			console.log(assignments[i],seminarID)
+			//console.log(assignments[i],seminarID)
 			if(Number(assignments[i]["assignmentID"]) == Number(seminarID)){
 				
 				assignmentRow = assignments[i];
@@ -69,7 +70,7 @@ function loadClassDetails(seminarID){
 			}
 		}
 		
-		console.log(assignmentRow, assignments)
+		//console.log(assignmentRow, assignments)
 		if(foundFlagClasses){
 
 			document.getElementById("className").innerHTML = classRow["className"]
@@ -100,7 +101,9 @@ function saveData(){
 	var userID = localStorage.getItem("userID")
 	var sessionValue = localStorage.getItem("sessionValue")
 	var topicID = document.getElementById("topicSelect").value;
-	
+	var quoting = String(document.getElementById("quotingArea").innerHTML);
+	console.log(quoting,notEmpty([quoting]))
+
 	if(!notEmpty(topicID)){
 		topicID = 0
 	}
@@ -135,16 +138,31 @@ function saveData(){
 		};
 		xhttp.open("POST", "/seminars/publishSeminarQuote", true);
 		xhttp.setRequestHeader("Content-type", "application/json");
-		
-		let sendcontent = {
-			"userID" : userID,
-			"sessionValue" : sessionValue,
-			"typedResponse" : btoa(typedResponse), 
-			"classID" : localStorage.getItem("tClassID"),
-			"assignmentID" : localStorage.getItem("tAssignmentID"),
-			"topicID" : Number(topicID)
+		let sendcontent;
+		if(notEmpty([quoting]) == true){
+			sendcontent = {
+				"userID" : userID,
+				"sessionValue" : sessionValue,
+				"typedResponse" : btoa(typedResponse), 
+				"classID" : localStorage.getItem("tClassID"),
+				"assignmentID" : localStorage.getItem("tAssignmentID"),
+				"topicID" : Number(topicID),
+				"quoting" : btoa(String(quoting))
+			}
 		}
+		else{
+			sendcontent = {
+				"userID" : userID,
+				"sessionValue" : sessionValue,
+				"typedResponse" : btoa(typedResponse), 
+				"classID" : localStorage.getItem("tClassID"),
+				"assignmentID" : localStorage.getItem("tAssignmentID"),
+				"topicID" : Number(topicID)
+			}
+		}
+		console.log(sendcontent)
 		//sends encoded Base64 of typedResponse rather than plain text to avoid any intrution or injection attacks.
+		//quotes will also be submitted in BTOA BASE64 format to avoid any comflict on character invalids
 		sendcontent = JSON.stringify(sendcontent)
 		xhttp.send(sendcontent);
 	
@@ -229,46 +247,66 @@ function createSeminarTopic(){
 		case "Blue":
 			color = "rgb(201, 240, 240)"
 			break
+		case "Green":
+			color = "rgb(60, 174, 163)"
+			break
+		case "Dark Blue":
+			color = "rgb(32, 99, 155)"
+			break
+		case "Grey":
+			color = "rgb(229, 229, 233)"
+			break
+		case "Yellow":
+			color = "rgb(246, 213, 92)"
+			break
 		default:
 			break
 	}
-	var userID = localStorage.getItem("userID")
+	//console.log(!notEmpty([topicName,topicColor]))
+	if(!notEmpty([topicName,color])){
+		document.getElementById("seminarTopicAlert").style.display = "block"
+	}
+	else{
+		var userID = localStorage.getItem("userID")
 
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
-	if (this.readyState == 4 && this.status == 200) {
-
-		var data = JSON.parse(this.responseText);
-		switch(data["status"]){
-			case "success":
-				
-				location.reload()
-				break
-			case "invalid":
-				document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
-				break
-			case "failure":
-                document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
-				break
-			default:
-                document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
-				break
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+	
+			var data = JSON.parse(this.responseText);
+			switch(data["status"]){
+				case "success":
+					
+					location.reload()
+					break
+				case "invalid":
+					document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
+					break
+				case "failure":
+					document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
+					break
+				default:
+					document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
+					break
+			}
+			
+			};
 		}
-		
-		};
+		xhttp.open("POST", "/seminars/createSeminarTopic", true);
+		xhttp.setRequestHeader("Content-type", "application/json");
+		let sendcontent = {
+			"userID" : userID,
+			"sessionValue" : localStorage.getItem("sessionValue"),
+			"topicName" : topicName,
+			"topicColor" : btoa(color),
+			"seminarID" : seminarID
+		}
+		//topicColor will be in base 64 because it contains special characters
+		sendcontent = JSON.stringify(sendcontent)
+		xhttp.send(sendcontent);
 	}
-	xhttp.open("POST", "/seminars/createSeminarTopic", true);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	let sendcontent = {
-		"userID" : userID,
-        "sessionValue" : localStorage.getItem("sessionValue"),
-		"topicName" : topicName,
-		"topicColor" : btoa(color),
-		"seminarID" : seminarID
-	}
-	//topicColor will be in base 64 because it contains special characters
-	sendcontent = JSON.stringify(sendcontent)
-	xhttp.send(sendcontent);
+
+	
 
 
 }
@@ -278,6 +316,13 @@ function loadSeminarTopics(){
 	var seminarID = String(window.location.href);
     seminarID = Number(seminarID.split("=")[1]);
 
+	try{
+		
+	}
+	catch(err){
+		console.log(err)
+	}
+	
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 	if (this.readyState == 4 && this.status == 200) {
@@ -305,28 +350,30 @@ function loadSeminarTopics(){
 						}
 
 						try{
-							number = Math.floor(Math.random() * (listOfCompatEntries.length ) + 0);
+							number = Math.floor(Math.random() * (listOfCompatEntries.length) + 0);
+							if(number == 0 && listOfCompatEntries.length == 0){
+								number = -1
+							}
 						}
 						catch{
-							number = 0;
+							number = -1;
 						}
-						if(listOfCompatEntries.length>=1 && number == 0){
-							number = 0
-						}
-						console.log(listOfCompatEntries, number)
+						
+						//console.log(listOfCompatEntries, number)
 
-						if(number <= 0){
+						if(number < 0){
 							document.getElementById("seminarPosts").innerHTML += `
 							<div class="col-md-6 col-sm-12" style="margin-top:20px;">
-								<div class="card" style="background-color: ${atob(d["topicColor"])}">
+								<div class="card topicCardClass" style="background-color: ${atob(d["topicColor"])}">
 								<div class="card-body">
 									<h4>It seems like no one has submitted a ${d["topicName"]} entry yet, go submit one now!</h4>
-									<a onclick="showEntryTopicDetail(${d["topicID"]})" class="btn btn-primary text-white">View More</a>&nbsp;<a onclick="deleteTopic(${d["topicID"]})" class="btn btn-danger deleteTopic" style="color:white;font-size:medium" style="display:none">Delete Topic</a>
+									<a onclick="showEntryTopicDetail(${d["topicID"]})" class="btn btn-primary text-white">View More</a>&nbsp;<a onclick="deleteTopic(${d["topicID"]})" class="btn btn-danger deleteTopic" style="color:white;font-size:medium" style="display:none" id="deleteTopic${d["topicID"]}">Delete Topic</a>
 								</div>
 								</div>
 							</div>`
 						}
 						else{
+							
 							let studentName = ""
 							let studentEntry = ""
 							
@@ -338,20 +385,20 @@ function loadSeminarTopics(){
 								
 								
 							}
-							console.log(listOfCompatEntries)
-
+							//.log(listOfCompatEntries)
+							
 							document.getElementById("seminarPosts").innerHTML += `
 							<div class="col-md-6 col-sm-12" style="margin-top:20px;">
-								<div class="card" style="background-color: ${atob(d["topicColor"])}">
+								<div class="card topicCardClass" style="background-color: ${atob(d["topicColor"])}">
 								<div class="card-body">
 									<h4 class="card-title">${d["topicName"]}</h4>
 									<sub>Here is a brief entry from student:</sub>
 									<div style="padding:5px; border-radius: 1%;">
 									<h5 id="studentName">${studentName}</h5>
-									<p id="studentEntry">${atob(listOfCompatEntries[number]["textEntry"])}</p>
+									<div id="studentEntry">${atob(listOfCompatEntries[number]["textEntry"]).substring(0,300)}<span>...</span></div>
 									
 									</div>
-									<a onclick="showEntryTopicDetail(${d["topicID"]})" class="btn btn-primary text-white">View More</a>&nbsp;<a onclick="deleteTopic(${d["topicID"]})" class="btn btn-danger deleteTopic" style="color:white;font-size:medium" style="display:none">Delete Topic</a>
+									<a onclick="showEntryTopicDetail(${d["topicID"]})" class="btn btn-primary text-white">View More</a>&nbsp;<a onclick="deleteTopic(${d["topicID"]})" class="btn btn-danger deleteTopic" style="color:white;font-size:medium" style="display:none" id="deleteTopic${d["topicID"]}">Delete Topic</a>
 								</div>
 								</div>
 							</div>`
@@ -381,6 +428,9 @@ function loadSeminarTopics(){
 								<option value="default" selected default>default</option>
 								<option value="Blue">Blue</option>
 								<option value="Red">Red</option>
+								<option value="Green">Green</option>
+								<option value="Grey">Grey</option>
+								<option value="Yellow">Yellow</option>
 							</select><span style="color:red">*</span>
 							
 							<hr>
@@ -395,9 +445,9 @@ function loadSeminarTopics(){
 				if(localStorage.getItem("priviledge") <= 1){
 					let topicClassElements = document.getElementsByClassName("deleteTopic")
 					let topicClassElementslength = topicClassElements.length;
-					console.log(topicClassElements,topicClassElementslength)
+					//console.log(topicClassElements,topicClassElementslength)
 					for(let i = 0;i<topicClassElementslength;i++){
-						console.log({i,topicClassElements})
+						//console.log({i,topicClassElements})
 						topicClassElements[topicClassElementslength-1-i].remove()
 					}
 				}
@@ -427,17 +477,7 @@ function loadSeminarTopics(){
 }
 
 
-function showEntryTopicDetail(topicID){
 
-	document.getElementById("topicCards").style.display = "none";
-	document.getElementById("topicDetail").style.display = "block";
-	document.getElementById("viewAllEntry").style.display = "none";
-
-
-
-
-	
-}
 
 function deleteTopic(topicID){
 	var userID = localStorage.getItem("userID")
@@ -449,8 +489,8 @@ function deleteTopic(topicID){
 		var data = JSON.parse(this.responseText);
 		switch(data["status"]){
 			case "success":
-				
-			
+				document.getElementById(`deleteTopic${topicID}`).parentElement.parentElement.parentElement.remove()
+
 				break
 			case "invalid":
 				document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
@@ -474,6 +514,7 @@ function deleteTopic(topicID){
 	}
 	sendcontent = JSON.stringify(sendcontent)
 	xhttp.send(sendcontent);
+	
 
 }
 
@@ -488,29 +529,346 @@ function loadAllEntry(){
 		loopStudent:
 		for(let s=0;s<studentInfo.length;s++){
 			if(entry[i]["studentID"] == studentInfo[s]["userID"]){
-				for(let p = 0;p<topic.length;p++){
-					if(topic[p]["topicID"] == entry[i]["topicID"]){
-						console.log(entry[i],studentInfo[s],topic[p],String(topic[p]["topicColor"]))
-						document.getElementById("viewAllEntry").innerHTML += `
-						<div class="card" style="background-color: rgb(255,255,255)">
-							<div class="card-body" id="">
-							<h4 class="card-title">Hitoki Kidahashi<a class="btn" style="background-color: ${atob(String(topic[p]["topicColor"]))}; margin-left: 10px;">${topic[p]["topicName"]}</a></h4>
+				if(notEmpty([topic])){
+					for(let p = 0;p<topic.length;p++){
+						if(topic[p]["topicID"] == entry[i]["topicID"] || entry[i]["topicID"] == 0){
+							console.log(entry[i],studentInfo[s],topic[p],String(topic[p]["topicColor"]))
+							let topicName = topic[p]["topicName"]
+							let topicColor = atob(String(topic[p]["topicColor"]))
+							if(entry[i]["topicID"] == 0){
+								topicName = "All"
+								topicColor = "rgb(230, 230, 230)"
+							}
+							let text = String(atob(entry[i]["textEntry"]))
+							if(entry[i]["isQuoting"] == "true"){
+								document.getElementById("viewAllEntry").innerHTML += `
+								<div class="card cardCSS" style="background-color: rgb(255,255,255)">
+									<div class="card-body" id="">
+									<div class="row">
+										<div class="col-8">
+											<h4 class="card-title">${studentInfo[s]["fullName"]}<a class="btn" style="background-color: ${topicColor}; margin-left: 10px;">${topicName}</a></h4>
+		
+										</div>
+										<div class="col-4">
+											<a onclick="deleteEntry(${entry[i]["entryID"]})" class="btn btn-sm btn-danger text-white deleteEntry" style="float:right">Delete Entry</a>
+										</div>
+									</div>
+									
+									<hr>
+									<div class="card" style="background-color: white;min-height: 100px;">
+				  
+										<div class="card-body" style="text-align:center">
+											${atob(entry[i]["quote"])}
+										</div>
+									
+									</div>
+									<div class='textEntry'>${text}</div>
+									</div>
+								</div>`
+							}
+							else{
+								document.getElementById("viewAllEntry").innerHTML += `
+								<div class="card cardCSS" style="background-color: rgb(255,255,255)">
+									<div class="card-body" id="">
+									<div class="row">
+										<div class="col-8">
+											<h4 class="card-title">${studentInfo[s]["fullName"]}<a class="btn" style="background-color: ${topicColor}; margin-left: 10px;">${topicName}</a></h4>
+		
+										</div>
+										<div class="col-4">
+											<a onclick="deleteEntry(${entry[i]["entryID"]})" class="btn btn-sm btn-danger text-white deleteEntry" style="float:right">Delete Entry</a>
+										</div>
+									</div>
+									
+									<hr>
+									<div class='textEntry'>${text}</div>
+									</div>
+								</div>`
+							}
 							
-							<hr>
-							<p>${atob(entry[i]["textEntry"])}</p>
-							</div>
-						</div>`
-						break loopStudent
+							break loopStudent
+						}
 					}
 				}
+				else{
+					if(entry[i]["topicID"] == 0){
+						//console.log(entry[i],studentInfo[s],topic[p],String(topic[p]["topicColor"]))
+						let topicName = "All"
+						let topicColor = "rgb(230, 230, 230)"
+						
+						let text = String(atob(entry[i]["textEntry"]))
+						if(entry[i]["isQuoting"] == "true"){
+							document.getElementById("viewAllEntry").innerHTML += `
+							<div class="card cardCSS" style="background-color: rgb(255,255,255)">
+								<div class="card-body" id="">
+								<div class="row">
+									<div class="col-8">
+										<h4 class="card-title">${studentInfo[s]["fullName"]}<a class="btn" style="background-color: ${topicColor}; margin-left: 10px;">${topicName}</a></h4>
+	
+									</div>
+									<div class="col-4">
+										<a onclick="deleteEntry(${entry[i]["entryID"]})" class="btn btn-sm btn-danger text-white deleteEntry" style="float:right">Delete Entry</a>
+									</div>
+								</div>
+								
+								<hr>
+								<div class="card" style="background-color: white;min-height: 100px;">
+				
+									<div class="card-body" style="text-align:center">
+										${atob(entry[i]["quote"])}
+									</div>
+								
+								</div>
+								<div class='textEntry'>${text}</div>
+								</div>
+							</div>`
+						}
+						else{
+							document.getElementById("viewAllEntry").innerHTML += `
+							<div class="card cardCSS" style="background-color: rgb(255,255,255)">
+								<div class="card-body" id="">
+								<div class="row">
+									<div class="col-8">
+										<h4 class="card-title">${studentInfo[s]["fullName"]}<a class="btn" style="background-color: ${topicColor}; margin-left: 10px;">${topicName}</a></h4>
+	
+									</div>
+									<div class="col-4">
+										<a onclick="deleteEntry(${entry[i]["entryID"]})" class="btn btn-sm btn-danger text-white deleteEntry" style="float:right">Delete Entry</a>
+									</div>
+								</div>
+								
+								<hr>
+								<div class='textEntry'>${text}</div>
+								</div>
+							</div>`
+						}
+						
+						break loopStudent
+					}
+					
+				}
+				
 				
 			}
 		}
 	}
-	
+	startSelect()
+	checkDeleteEntry()
 
 }
 
+
+function showEntryTopicDetail(topicID){
+
+	document.getElementById("topicCards").style.display = "none";
+	document.getElementById("topicDetail").style.display = "block";
+	document.getElementById("viewAllEntry").style.display = "none";
+
+	var entry = JSON.parse(localStorage.getItem("seminarEntry"))
+	var studentInfo = JSON.parse(localStorage.getItem("seminarStudentData"))
+	var topic = JSON.parse(localStorage.getItem("seminarTopic"))	
+	var topicColor;
+	var topicName;
+	for(let i=0;i<entry.length;i++){
+		loopStudent:
+		for(let s=0;s<studentInfo.length;s++){
+			if(entry[i]["studentID"] == studentInfo[s]["userID"]){
+				if(entry[i]["topicID"] == topicID){
+					for(let p = 0;p<topic.length;p++){
+						if(topic[p]["topicID"] == entry[i]["topicID"]){
+							topicColor = atob(topic[p]["topicColor"])
+							topicName = topic[p]["topicName"]
+							//console.log(entry[i],studentInfo[s],topic[p],String(topic[p]["topicColor"]))
+							if(entry[i]["isQuoting"] == "true"){
+								document.getElementById("topicDetail").innerHTML += `
+								<div class="card cardCSS" style="background-color: rgb(255,255,255)">
+									<div class="card-body" id="seminarEntry${entry[i]["entryID"]}">
+									
+									<div class="row">
+										<div class="col-8">
+											<h4 class="card-title">${studentInfo[s]["fullName"]}</h4>
+										</div>
+										<div class="col-4">
+											<a onclick="deleteEntry(${entry[i]["entryID"]})" class="btn btn-sm btn-danger text-white deleteEntry" style="float:right">Delete Entry</a>
+										</div>
+									</div>
+									<hr>
+									<div class="card" style="background-color: white;min-height: 100px;">
+              
+										<div class="card-body" style="text-align:center">
+											${atob(entry[i]["quote"])}
+										</div>
+								
+									</div>
+									<div class="textEntry">${atob(entry[i]["textEntry"])}</div>
+									</div>
+								</div>
+								`
+							}
+							else{
+								document.getElementById("topicDetail").innerHTML += `
+								<div class="card cardCSS" style="background-color: rgb(255,255,255)">
+									<div class="card-body" id="seminarEntry${entry[i]["entryID"]}">
+									
+									<div class="row">
+										<div class="col-8">
+											<h4 class="card-title">${studentInfo[s]["fullName"]}</h4>
+										</div>
+										<div class="col-4">
+											<a onclick="deleteEntry(${entry[i]["entryID"]})" class="btn btn-sm btn-danger text-white deleteEntry" style="float:right">Delete Entry</a>
+										</div>
+									</div>
+									<hr>
+									
+									<div class="textEntry">${atob(entry[i]["textEntry"])}</div>
+									</div>
+								</div>
+								`
+							}
+							
+							break loopStudent
+						}
+					}
+				}
+				else{
+					break loopStudent
+				}
+				
+				
+			}
+		}
+	}
+	if(notEmpty([topicName,topicColor])){
+		document.getElementById("topicTag").style.backgroundColor = String(topicColor)
+		document.getElementById("topicTag").innerHTML = String(topicName)
+	}
+	else{
+		document.getElementById("topicTag").style.display = "none"
+		document.getElementById("topicDetail").innerHTML += `No one has submitted an entry for this topic yet`
+
+	}
+	checkDeleteEntry()
+	startSelect()
+
+	/*
+	 <div class="card" style="background-color: rgb(255,255,255)">
+            <div class="card-body" id="">
+            <h4 class="card-title">Hitoki Kidahashi</h4>
+            
+            <hr>
+            <p>This is text</p>
+            </div>
+          </div>*/
+
+}
+function checkDeleteEntry(){
+	if(localStorage.getItem("priviledge") <= 1){
+		let deleteBtns = document.getElementsByClassName("deleteEntry")
+		let deleteBtnsLength = deleteBtns.length;
+		for(let i = 0;i<deleteBtnsLength;i++){
+			
+			deleteBtns[deleteBtnsLength-1-i].remove()
+		}
+	}
+}
+
+function startSelect(){
+	
+	var textEntryClassList = document.getElementsByClassName("textEntry")
+	  
+	for(let i=0;i<textEntryClassList.length;i++){
+		textEntryClassList[i].addEventListener("mouseup",SelectText)
+	}
+
+}
+
+function SelectText(){
+	
+	
+	if(notEmpty([GetSelectedText()])){
+		document.getElementById("quotingSection").style.display = "block"
+		document.getElementById("quotingArea").innerHTML += `<span style="margin:auto;padding:5px;min-width: 40%;font-weight:bold;font-size:20px;font-style:italic;"><span style="font-size:30px">"</span>${GetSelectedText()}<span style="font-size:30px">"</span></span>`
+	}
+}
+
+function GetSelectedText () {
+	var selText = "";
+	if (window.getSelection) {  // all browsers, except IE before version 9
+		if (document.activeElement && 
+				(document.activeElement.tagName.toLowerCase () == "textarea" || 
+				 document.activeElement.tagName.toLowerCase () == "input")){
+			var text = document.activeElement.value;
+			selText = text.substring (document.activeElement.selectionStart, 
+									  document.activeElement.selectionEnd);
+		}
+		else {
+			var selRange = window.getSelection ();
+			selText = selRange.toString ();
+		}
+	} 
+	
+	return selText;
+}
+
+
+function deleteEntry(entryID){
+
+	var confirmDelete = confirm("Are you sure to delete this entry?")
+	if(confirmDelete){
+		var userID = localStorage.getItem("userID")
+		var sessionValue = localStorage.getItem("sessionValue")
+		if(Number(localStorage.getItem("priviledge"))>1){
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+
+				var data = JSON.parse(this.responseText);
+				switch(data["status"]){
+					case "success":
+						location.reload()
+
+						break
+					case "invalid":
+						document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
+						break
+					case "failure":
+						document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
+						break
+					default:
+						document.getElementsByTagName("body")[0].innerHTML = `<center class="alert alert-danger" style="color:white">An Error has occured Please try login again</center>` + document.getElementsByTagName("body")[0].innerHTML 
+						break
+				}
+				
+				};
+			}
+			xhttp.open("POST", "/seminars/deleteEntry", true);
+			xhttp.setRequestHeader("Content-type", "application/json");
+			let sendcontent = {
+				"userID" : userID,
+				"sessionValue" : sessionValue,
+				"entryID" : entryID
+			}
+			sendcontent = JSON.stringify(sendcontent)
+			xhttp.send(sendcontent);
+		}
+		else{
+			alert("You do not have the priviledge for deleting this Entry, you will be logged out.")
+			logout()
+			location.assign("/login")
+		}
+		
+		
+
+
+	}
+	
+}
+
+function showTopic(){
+	document.getElementById("topicCards").style.display = "block";
+	document.getElementById("topicDetail").style.display = "none";
+	document.getElementById("viewAllEntry").style.display = "block";
+}
 
 // editor.on( 'change', function( evt ) {
 //     // getData() returns CKEditor's HTML content.

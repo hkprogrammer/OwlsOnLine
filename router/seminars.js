@@ -18,7 +18,8 @@ var port = require(__dirname + '/modules/port.js')
 		"typedResponse" : typedResponse, //in base64
 		"classID" : localStorage.getItem("tClassID"),
 		"assignmentID" : localStorage.getItem("tAssignmentID"),
-        "topicID" : number(topicID)
+        "topicID" : number(topicID),
+        "quoting" : btoa(String(quoting)) //optional quotes
     }
  */
 
@@ -32,7 +33,7 @@ router.post("/publishSeminarQuote", (req,res)=>{
     var incomingClassID = data["classID"]
     var incomingAsignmentID = data["assignmentID"]
     var incomingTopicID = data["topicID"]
-
+    var incomingQuote = data["quoting"]
 
     axios({
         method: 'post',
@@ -65,8 +66,15 @@ router.post("/publishSeminarQuote", (req,res)=>{
                 
                     let entryID = Number(maximumNumber);
 
-                
-                    sql = `INSERT INTO seminarEntry(entryID,studentID,classID,assignmentID,textEntry,topicID) VALUES(${entryID},${incomingUserID},${incomingClassID},${incomingAsignmentID},"${String(incomingTypedResponse)}",${incomingTopicID})`
+                    let date = new Date().getTime()
+
+                    if(notEmpty([incomingQuote])){
+                        sql = `INSERT INTO seminarEntry(entryID,studentID,classID,assignmentID,textEntry,topicID,entryDate,isQuoting,quote) VALUES(${entryID},${incomingUserID},${incomingClassID},${incomingAsignmentID},"${String(incomingTypedResponse)}",${incomingTopicID},"${date}","true","${incomingQuote}")`
+
+                    }
+                    else{
+                        sql = `INSERT INTO seminarEntry(entryID,studentID,classID,assignmentID,textEntry,topicID,entryDate,isQuoting) VALUES(${entryID},${incomingUserID},${incomingClassID},${incomingAsignmentID},"${String(incomingTypedResponse)}",${incomingTopicID},"${date}","false")`
+                    }
 
                     database.all(sql, (err, rows)=>{
                         if(err){
@@ -213,7 +221,7 @@ router.post("/loadSeminarTopics", (req,res)=>{
             "status" : "success",
             "topicRows" : rows
         }
-        sql = `SELECT * FROM seminarEntry WHERE assignmentID=${incomingSeminarID} ORDER BY entryID ASC`
+        sql = `SELECT * FROM seminarEntry WHERE assignmentID=${incomingSeminarID} ORDER BY entryDate ASC`
         database.all(sql, (err,rows)=>{
             if(err){
                 new logging(`Err ${err}`, "Errors").writeLog()
@@ -264,7 +272,7 @@ router.post("/deleteSeminarTopic", (req,res)=>{
 
     var data = req.body;
     var incomingUserID = data["userID"]
-    var incomingSessionValue = data["userID"]
+    var incomingSessionValue = data["sessionValue"]
     var incomingTopicID= data["topicID"]
 
     axios({
@@ -316,6 +324,82 @@ router.post("/deleteSeminarTopic", (req,res)=>{
     });
 
 })
+
+/**
+ * 
+ * {
+        "userID" : userID,
+        "sessionValue" : sessionValue,
+   		"entryID" : entryID
+    }
+ * 
+ */
+
+router.post("/deleteEntry", (req,res)=>{
+
+    var data = req.body;
+    var incomingUserID = data["userID"]
+    var incomingSessionValue = data["sessionValue"]
+    var incomingEntryID= data["entryID"]
+
+    axios({
+        method: 'post',
+        url: 'https://127.0.0.1:' + new port().portNumber() + '/credentials/validateSession',
+        data: { 
+            "userID": incomingUserID,
+            "sessionValue" : incomingSessionValue
+        }
+        }).then((response) => {
+        //response.data -> {rows : [], status: String}
+            if(response.data["status"] == "success"){
+
+                let sql = `DELETE FROM seminarEntry WHERE entryID=${incomingEntryID}`
+                database.all(sql, (err,rows)=>{
+                    if(err){
+                        new logging(`Err ${err}`, "Errors").writeLog()
+                        throw err
+                    }
+                    let responsePacket = {
+                        "status" : "success"
+                    }
+                    res.send(responsePacket)
+                })
+            
+            }
+            else{
+                let responsePacket = {
+                    "status" : "failure"
+                }
+                res.send(responsePacket)
+                console.log("failure")
+            }
+        
+
+
+        }, (error) => {
+            new logging(`Err ${error}`, "Errors").writeLog()
+            console.error(error)
+    });
+
+})
+
+
+
+function notEmpty(inList){
+    for(let i=0;i<inList.length;i++){
+        let d = String(inList[i]) //d variable stores the temporary data in string type for each iterations in list.
+        if(d == "" || d == " " || d == "null" || d == "0" || d == "NaN" || d == "undefined"){
+			if(d.length<1){
+				return false
+			}
+            return false
+        }
+        else{
+            continue
+        }
+    }
+    return true;
+}
 
 
 

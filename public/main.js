@@ -4,7 +4,31 @@ var classList = [];
 function load(){
     ValidateSession()
     queryUsername()
+    checkValidity()
     
+}
+function checkValidity(){
+    let local = localStorage.getItem("userID")
+    if(isEmpt([local])){
+        location.assign("/login")
+        
+    }
+}
+function isEmpt(inList){
+    for(let i=0;i<inList.length;i++){
+        let d = String(inList[i]) //d variable stores the temporary data in string type for each iterations in list.
+        if(d == "" || d == " " || d == "null" || d == "0" || d == "NaN" || d == "undefined"){
+			if(d.length<1){
+				return true
+			}
+            return true
+        }
+        else{
+            continue
+        }
+    }
+    return false;
+
 }
 
 function ValidateSession(){
@@ -105,7 +129,9 @@ function logout(){
         if(data["status"] == "success"){
             document.getElementById("logged-in").style.display = "none";
             document.getElementById("logged-out").style.display = "inline";
+            localStorage.clear()
         }
+        location.assign("/login")
         
 
     }
@@ -121,9 +147,7 @@ function logout(){
     sendcontent = JSON.stringify(sendcontent)
     xhttp.send(sendcontent);
     
-    localStorage.removeItem("sessionValue")
-    localStorage.removeItem("userID")
-    localStorage.removeItem("loginStatus")
+    
 }
 
 
@@ -177,6 +201,9 @@ function viewClass(classID){
 
     
 
+}
+function saveClassDetails(){
+    localStorage.setItem("classDetail", JSON.stringify(classList))
 }
 
 // var xhttp = new XMLHttpRequest();

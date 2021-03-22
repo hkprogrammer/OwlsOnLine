@@ -186,9 +186,12 @@ router.post('/validateSession', (req,res)=>{
                     
                     break
                 }
+                
                 else{
+                    
                     console.log("Invalid Entry")
                 }
+                console.log(rows[i],data["sessionValue"])
             }
             
         }
